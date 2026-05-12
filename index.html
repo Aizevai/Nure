@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для тебя ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #fff; overflow-x: hidden; }
+
+        .screen {
+            position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+            padding: 20px; overflow-y: auto; z-index: 10;
+        }
+        .screen.active { display: flex; }
+
+        .hearts-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+        .heart { position: absolute; bottom: -60px; color: #ff4d4d; animation: floatUp linear forwards; }
+        @keyframes floatUp { to { transform: translateY(-135vh) rotate(480deg); } }
+
+        .content { position: relative; z-index: 2; text-align: center; max-width: 620px; width: 100%; }
+
+        .envelope { font-size: 135px; animation: gentleFloat 3s ease-in-out infinite; }
+        @keyframes gentleFloat { 50% { transform: translateY(-15px); } }
+
+        .title { font-family: 'Great Vibes', cursive; font-size: 2.7rem; color: #d44a6d; margin: 25px 0; }
+
+        .btn { padding: 15px 45px; font-size: 1.35rem; border: none; border-radius: 50px; cursor: pointer; }
+        .btn-pink { background: #FFC1D0; color: white; box-shadow: 0 6px 15px rgba(255,182,193,0.4); }
+
+        .poem { 
+            font-family: 'Playfair Display', serif; font-size: 1.3rem; line-height: 1.8;
+            background: #fff0f5; padding: 35px; border-radius: 25px; margin: 20px 0;
+        }
+
+        /* ─── КНИГА ─── */
+        #book-screen { background: #f5f0e8; padding: 0; overflow-y: auto; display: none; }
+        #book-screen.active { display: block; }
+
+        .book-content { max-width: 820px; margin: 0 auto; padding: 20px; }
+
+        .book-cover {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            background: #faf6f0;
+            position: relative;
+            box-shadow: 0 0 60px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .book-cover::before {
+            content: '';
+            position: absolute;
+            top: 20px; left: 20px; right: 20px; bottom: 20px;
+            border: 2px solid #8b5e3c;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .book-cover img {
+            width: 280px; height: 380px; object-fit: cover; border-radius: 4px;
+            margin-bottom: 40px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .book-cover h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700; color: #2c1e14; margin-bottom: 10px;
+        }
+        .book-cover p {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: #8b5e3c;
+        }
+
+        .book-page {
+            min-height: 100vh;
+            background: #faf6f0;
+            padding: 60px 50px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+            position: relative;
+            page-break-after: always;
+        }
+        .book-page::before {
+            content: '';
+            position: absolute;
+            top: 30px; left: 30px; right: 30px; bottom: 30px;
+            border: 1px solid rgba(139, 94, 60, 0.15);
+            pointer-events: none; border-radius: 2px;
+        }
+
+        .chapter-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.85rem; text-transform: uppercase;
+            letter-spacing: 4px; color: #8b5e3c;
+            opacity: 0.6; margin-bottom: 15px; text-align: center;
+        }
+        .chapter-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 700; text-align: center;
+            margin-bottom: 50px; color: #2c1e14; line-height: 1.3;
+        }
+        .chapter-title::after {
+            content: '';
+            display: block;
+            width: 60px; height: 2px;
+            background: #8b5e3c;
+            margin: 25px auto 0; opacity: 0.4;
+        }
+        .chapter-text p {
+            text-indent: 2em; margin-bottom: 1.2em;
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            text-align: justify; hyphens: auto;
+            font-family: 'Noto Serif', 'Georgia', serif;
+            color: #2c1e14; line-height: 1.8;
+        }
+        .chapter-text p:first-of-type::first-letter {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em; float: left;
+            line-height: 0.8; padding-right: 8px; padding-top: 4px;
+            color: #8b5e3c;
+        }
+        .dialogue {
+            margin-left: 2em; font-style: italic; color: #4a3525;
+        }
+
+        .final-page {
+            min-height: 100vh;
+            background: #faf6f0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 60px 40px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .final-page h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 30px; color: #2c1e14;
+        }
+        .final-page p {
+            font-style: italic; font-size: 1.1rem;
+            color: #8b5e3c; max-width: 500px;
+        }
+        .the-end {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; margin-top: 60px;
+            letter-spacing: 8px; text-transform: uppercase;
+            color: #8b5e3c; opacity: 0.5;
+        }
+
+        .back-btn {
+            position: fixed; top: 15px; left: 15px;
+            padding: 12px 20px; background: white;
+            border-radius: 30px; border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 100; cursor: pointer; font-family: 'Poppins', sans-serif;
+        }
+
+        /* ─── КОТ (экран "нет") ─── */
+        #cat-section {
+            display: none; position: absolute; inset: 0;
+            background: rgba(255,255,255,0.97); z-index: 30;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        #cat-section .hearts-container { z-index: 1; }
+        #cat-section .content { z-index: 2; position: relative; }
+
+        @media (max-width: 600px) {
+            .book-page { padding: 40px 25px; }
+            .book-page::before { top: 15px; left: 15px; right: 15px; bottom: 15px; }
+            .book-cover img { width: 220px; height: 300px; }
+            .chapter-text p:first-of-type::first-letter { font-size: 2.8em; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ ЭКРАН 1: Конверт ═══ -->
+    <div id="screen1" class="screen active">
+        <div class="hearts-container"></div>
+        <div class="content">
+            <div class="envelope">✉️</div>
+            <h1 class="title">У меня для тебя письмо</h1>
+            <button class="btn btn-pink" onclick="nextScreen(2)">Далее ❤️</button>
+        </div>
+    </div>
+
+    <!-- ═══ ЭКРАН 2: Вопрос ═══ -->
+    <div id="screen2" class="screen">
+        <div class="hearts-container"></div>
+        <div class="content">
+            <p style="font-size:1.5rem;color:#d44a6d;margin-bottom:10px;">хочешь открыть?</p>
+            <div style="font-size:175px;color:#222;margin:10px 0;">?</div>
+            <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
+                <button class="btn btn-pink" onclick="nextScreen(3)">Даааа ❤️</button>
+                <button class="btn" style="background:transparent;border:3px solid #222;color:#222;" onclick="showCat()">неееет</button>
+            </div>
+        </div>
+
+        <div id="cat-section">
+            <div class="hearts-container"></div>
+            <div class="content">
+                <p style="font-size:1.6rem;color:#d44a6d;margin-bottom:25px;">Ну, пожалуйста...</p>
+                <div style="font-size:120px;margin:20px 0;">🐱</div>
+                <button class="btn btn-pink" onclick="backToQuestion()">Ладно, сейчас открою</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ ЭКРАН 3: Стихотворение ═══ -->
+    <div id="screen3" class="screen">
+        <div class="hearts-container"></div>
+        <div class="content">
+            <div class="poem">
+                Осенний двор, качели, смех,<br>
+                Ты — тёплый луч, ты — мой успех.<br>
+                Сестрёнки рядом, свет в глазах,<br>
+                Но жизнь развеяла наш страх.<br><br>
+
+                Школа, классы, разные пути,<br>
+                Но взгляды снова нас свели.<br>
+                Твой добрый свет я берегу,<br>
+                И в сердце бережно храню.<br><br>
+
+                Моя девочка, ты — свет,<br>
+                Даже если рядом нет.<br>
+                Твоя улыбка — мой покой,<br>
+                Я возвращаюсь за тобой.
+            </div>
+            <button class="btn btn-pink" style="font-size:1.45rem;padding:18px 55px;" onclick="openBook()">Получить подарок</button>
+        </div>
+    </div>
+
+    <!-- ═══ КНИГА (полная, все 10 глав + обложка) ═══ -->
+    <div id="book-screen" class="screen">
+        <button class="back-btn" onclick="backToPoem()">← Назад</button>
+
+        <div class="book-content">
+
+            <!-- ОБЛОЖКА -->
+            <section class="book-cover" id="cover">
+                <img src="https://getfile.dokpub.com/yandex/get/https://disk.yandex.ru/i/r2AHJTBkW3aYNg" alt="Обложка">
+                <h1>Моя девочка, ты — мой свет</h1>
+                <p>История, начавшаяся однажды осенью</p>
+            </section>
+
+            <!-- ГЛАВА 1 -->
+            <section class="book-page" id="ch1">
+                <div class="chapter-number">Глава первая</div>
+                <h2 class="chapter-title">Осенняя встреча и тайна кленового листа</h2>
+                <div class="chapter-text">
+                    <p>Осень в нашем дворе всегда пахла по-особенному: мокрым асфальтом, горьковатым дымом и прелыми листьями, которые дворник сгребал в огромные, дышащие паром кучи. В тот день я, как обычно, сидел на старой, скрипучей скамейке, наблюдая, как ветер играет с опавшей листвой. Мои сестрёнки, совсем ещё малышки, с визгом носились по площадке. Их смех был привычным фоном моего детства.</p>
+                    <p>И вдруг — новый звук. Чистый, хрустальный смех, похожий на перезвон льдинок. Я поднял голову. У качелей стояла девочка. Не просто девочка, а какое-то солнечное явление в сером осеннем дне. Её волосы, выбившиеся из-под шапки, отливали медью, а щёки горели румянцем. Она не просто смеялась — она жила в этом смехе, заражая им моих сестёр, которые уже облепили её со всех сторон.</p>
+                    <p>Я замер, боясь спугнуть это мгновение. Она обернулась, словно почувствовав мой взгляд. Наши глаза встретились на долю секунды, но мне показалось, что время остановилось. В её взгляде не было ни капли смущения, только открытое, тёплое любопытство. В этот миг я понял: моя жизнь изменилась навсегда. Я даже не знал её имени, но уже чувствовал необъяснимую тягу к этому свету.</p>
+                </div>
+            </section>
+
+            <!-- ГЛАВА 2 -->
+            <section class="book-page" id="ch2">
+                <div class="chapter-number">Глава вторая</div>
+                <h2 class="chapter-title">Школьные коридоры и карта сокровищ</h2>
+                <div class="chapter-text">
+                    <p>Школа оказалась лабиринтом из бесконечных коридоров и чужих лиц. Нас развели по разным классам, словно кто-то нарочно решил проверить прочность невидимой нити, связавшей нас в тот осенний день. Теперь мы были обитателями параллельных миров, которые пересекались лишь на переменах.</p>
+                    <p>Я стал исследователем. Каждый мой день превращался в составление карты: «Она у окна на втором этаже», «Она всегда выходит из столовой с яблочным соком», «Её парта у двери в кабинете литературы». Я выучил наизусть её маршрут и научился оказываться в нужных точках так, чтобы наши взгляды могли встретиться. Это была наша тайная игра в шпионов. В шумной толпе, среди сотен голосов и шагов, я безошибочно находил её силуэт. И когда наши глаза встречались, мир вокруг на мгновение замирал, а потом взрывался калейдоскопом красок. Однажды я даже набрался смелости и оставил ей на подоконнике кленовый лист — такой же багряный, как тот день нашей встречи.</p>
+                </div>
+            </section>
+
+            <!-- ГЛАВА 3 -->
+            <section class="book-page" id="ch3">
+                <div class="chapter-number">Глава третья</div>
+                <h2 class="chapter-title">Зимняя сказка и спасённая кошка</h2>
+                <div class="chapter-text">
+                    <p>Настоящее испытание для нашей хрупкой связи выпало зимой. Город накрыло снегопадом, превратившим всё в белую сказку. После уроков я брёл домой, пиная сугробы, когда услышал тихое, жалобное мяуканье.</p>
+                    <p>На высоком дереве, вцепившись в ветку и дрожа от страха и холода, сидела маленькая чёрная кошка. А под деревом металась она. Я узнал её сразу, даже в огромной пуховой куртке и смешной шапке с помпоном.</p>
+                    <p>Не раздумывая ни секунды, я полез на дерево. Ветки царапали лицо, снег сыпался за шиворот, но я должен был достать этого зверя. Это было моё первое геройство. Когда я спустился вниз и протянул ей мокрый, дрожащий комочек шерсти, её глаза сияли ярче всех звёзд.</p>
+                    <p class="dialogue">— Ты такой смелый! — прошептала она.</p>
+                    <p>И от этого простого слова внутри меня разлилось такое тепло, что никакой мороз был не страшен. Мы вместе отнесли замёрзшую кошку в подъезд её дома и долго грели её у батареи.</p>
+                </div>
+            </section>
+
+            <!-- ГЛАВА 4 -->
+            <section class="book-page" id="ch4">
+                <div class="chapter-number">Глава четвёртая</div>
+                <h2 class="chapter-title">Летний лагерь и письмо в бутылке</h2>
+                <div class="chapter-text">
+                    <p>Лето разлучило нас надолго. Родители отправили меня в спортивный лагерь на всё лето. Дни тянулись мучительно долго, наполненные тренировками и тоской по дому. Единственной связью с миром были письма от мамы.</p>
+                    <p>И вот однажды я получил не просто письмо. На берегу озера я нашёл старую бутылку с запиской внутри. Почерк был незнакомым, но сердце подсказало мне правду. Это была она! Она писала о том, как скучает по нашим встречам во дворе, как проходит её лето.</p>
+                    <p>Это было настоящее приключение! Тайная переписка через «почтальонов» из числа ребят из её двора стала моим спасением. Каждое новое послание было сокровищем. Я хранил эти мятые листки в тумбочке у кровати и перечитывал их перед сном.</p>
+                </div>
+            </section>
+
+            <!-- ГЛАВА 5 -->
+            <section class="book-page" id="ch5">
+                <div class="chapter-number">Глава пятая</div>
+                <h2 class="chapter-title">Школьный бал и танец под звёздами</h2>
+                <div class="chapter-text">
+                    <p>Выпускной бал казался чем-то далёким и нереальным. Но вот он настал — вечер, когда школьные коридоры наполнились шелестом платьев и ароматом дорогих духов.</p>
+                    <p>Я долго не решался подойти к ней. Она была прекрасна в своём простом, но элегантном платье. Я видел, как к ней подходят другие ребята, приглашают танцевать. От ревности сжималось сердце.</p>
+                    <p>И вот заиграла медленная музыка. Я собрал всю свою смелость в кулак и шагнул к ней.</p>
+                    <p class="dialogue">— Потанцуем? — мой голос предательски дрогнул.</p>
+                    <p>Она улыбнулась своей тёплой улыбкой и вложила свою ладонь в мою.</p>
+                    <p>В этот момент мы были не в шумном спортзале, а одни во всей Вселенной. Я чувствовал тепло её руки и понимал: я люблю всё в ней — от её привычки прикусывать губу до того, как она доверчиво кладёт голову мне на плечо. Мы кружились в танце так долго, что у меня закружилась голова не от музыки, а от счастья.</p>
+                </div>
+            </section>
+
+            <!-- ГЛАВА 6 -->
+            <section class="book-page" id="ch6">
+                <div class="chapter-number">Глава шестая</div>
+                <h2 class="chapter-title">Поступление и прощание на вокзале</h2>
+                <div class="chapter-text">
+                    <p>Пришло время выбирать дорогу во взрослую жизнь. Мы поступили в разные вузы в разных городах. Расставание было неизбежным. День отъезда выдался дождливым и серым.</p>
+                    <p>Мы стояли на перроне вокзала среди суеты и шума объявлений. Чемодан казался неподъёмным грузом не из-за вещей, а из-за тяжести предстоящей разлуки.</p>
+                    <p class="dialogue">— Пиши мне... всегда пиши мне... — шептала она сквозь слёзы.</p>
+                    <p>Я кивал, не в силах вымолвить ни слова. Поезд тронулся, и я прилип к окну, глядя на её удаляющуюся фигурку под дождём до тех пор, пока она не превратилась в маленькую точку и не исчезла совсем.</p>
+                </div>
+            </section>
+
+            <!-- ГЛАВА 7 -->
+            <section class="book-page" id="ch7">
+                <div class="chapter-number">Глава седьмая</div>
+                <h2 class="chapter-title">Первая сессия и ночной звонок</h2>
+                <div class="chapter-text">
+                    <p>Первый курс был настоящим испытанием на прочность. Лекции, семинары, бессонные ночи над конспектами — я чувствовал себя одиноким и потерянным в чужом городе.</p>
+                    <p>В один из таких тяжёлых вечеров мой телефон зазвонил глубокой ночью. Это была она.</p>
+                    <p class="dialogue">— У тебя всё получится! Я знаю! — её голос был бодрым и уверенным, словно она была рядом.</p>
+                    <p>Мы проговорили до утра. Она рассказывала мне смешные истории из своей жизни так заразительно, что я забыл про все свои страхи и тревоги перед экзаменом. Её вера в меня стала тем самым щитом, который помог выдержать первую сессию.</p>
+                </div>
+            </section>
+
+            <!-- ГЛАВА 8 -->
+            <section class="book-page" id="ch8">
+                <div class="chapter-number">Глава восьмая</div>
+                <h2 class="chapter-title">Зимние каникулы и возвращение домой</h2>
+                <div class="chapter-text">
+                    <p>Зимние каникулы стали светом в конце туннеля. Я ехал домой с одним желанием — увидеть её поскорее. Город встретил меня запахом мандаринов и ёлки.</p>
+                    <p>Мы встретились у той самой старой скамейки во дворе. Снег укутал всё вокруг пушистым одеялом.</p>
+                    <p class="dialogue">— Ты совсем не изменилась, — сказал я правду.</p>
+                    <p class="dialogue">— А ты стал совсем взрослым мужчиной, — ответила она с улыбкой.</p>
+                    <p>В этот момент я понял окончательно: она — мой дом. Не стены или адрес, а именно она — человек, рядом с которым можно снять все маски и быть собой.</p>
+                </div>
+            </section>
+
+            <!-- ГЛАВА 9 -->
+            <section class="book-page" id="ch9">
+                <div class="chapter-number">Глава девятая</div>
+                <h2 class="chapter-title">Годовщина и сюрприз через всю страну</h2>
+                <div class="chapter-text">
+                    <p>Прошёл год нашей разлуки. Приближалась дата нашего знакомства — та самая осень у качелей. Я понимал, что должен сделать что-то особенное.</p>
+                    <p>Я копил деньги от подработок несколько месяцев и наконец купил билет к ней на выходные. Это был сюрприз! Я прилетел ранним утром и сразу отправился к её дому с огромным букетом её любимых белых пионов (я помнил это с детства).</p>
+                    <p>Она открыла дверь и замерла от удивления.</p>
+                    <p class="dialogue">— Ты? Как?</p>
+                    <p>В её глазах я увидел всё то же тепло и тот самый добрый свет из первой главы.</p>
+                </div>
+            </section>
+
+            <!-- ГЛАВА 10 -->
+            <section class="book-page" id="ch10">
+                <div class="chapter-number">Глава десятая</div>
+                <h2 class="chapter-title">Мой свет</h2>
+                <div class="chapter-text">
+                    <p>Годы летят незаметно. Мы давно закончили учёбу, нашли работу, построили свои жизни в разных городах. Но расстояние для нас так и осталось лишь цифрой на карте.</p>
+                    <p>Я сижу у окна своей квартиры в большом городе и смотрю на огни ночных улиц. За окном может быть дождь или снегопад, но внутри меня всегда горит ровный и тёплый огонь.</p>
+                    <p>Моя девочка... Ты — мой свет (мой свет). Даже если рядом нет (нет). Я люблю твою теплоту (теплоту) и твою доброту (доброту). Ты — не просто воспоминание из детства или первая любовь (нет). Ты — мой дом (мой дом) и мой покой (мой покой). И пока этот свет горит внутри меня (внутри меня), я знаю: мы всегда найдём дорогу друг к другу через любые расстояния (расстояния).</p>
+                </div>
+            </section>
+
+            <!-- ФИНАЛ -->
+            <section class="final-page" id="final">
+                <h2>Моя девочка, ты — мой свет</h2>
+                <p>Спасибо, что ты есть.</p>
+                <div class="the-end">Конец</div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        function createHeart(container) {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = ['❤️','💗','💖','💘'][Math.floor(Math.random()*4)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 5 + 7) + 's';
+            heart.style.fontSize = (Math.random() * 20 + 24) + 'px';
+            container.appendChild(heart);
+            setTimeout(() => heart.remove(), 25000);
+        }
+
+        function startHearts() {
+            document.querySelectorAll('.hearts-container').forEach(container => {
+                setInterval(() => { if (Math.random() > 0.2) createHeart(container); }, 220);
+                for (let i = 0; i < 25; i++) setTimeout(() => createHeart(container), i * 70);
+            });
+        }
+
+        function nextScreen(n) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen' + n).classList.add('active');
+        }
+
+        function showCat() {
+            document.getElementById('cat-section').style.display = 'flex';
+        }
+        function backToQuestion() {
+            document.getElementById('cat-section').style.display = 'none';
+        }
+        function openBook() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('book-screen').classList.add('active');
+        }
+        function backToPoem() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen3').classList.add('active');
+        }
+
+        window.onload = startHearts;
+    </script>
+</body>
+</html>
